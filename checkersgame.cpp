@@ -581,10 +581,10 @@ void CheckersGame::firstClick(int i, int j) {
 void CheckersGame::secondClick(int i, int j) {
 	//std::cout << "Click 1" << "\n"; std::cout.flush();
 	bool move = false;
-	if ( (tmppoint.x == i && tmppoint.y == j) ) {
-		return;
-	}
-	if( current->isNull(i,j) )
+//	if ( (tmppoint.x == i && tmppoint.y == j) ) {
+//		return;
+//	}
+	if( current->isNull(i,j) || (tmppoint.x == i && tmppoint.y == j))
 		move = this->move( tmppoint , point(i,j,MOVEDTO) );
 	if( !move ) {
 		click =0;
