@@ -115,6 +115,14 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
 
 	QColor dark(0xcc,0xcc,0xcc,200);
 
+
+//	QColor endColor(0x4c,0x4c,0xcc);
+	QColor endColor(0x90,0x00,0x90,200);
+	QColor startColor(0x33,0xff,0x00,200);
+	QColor capturedColor(0xff,0x33,0x33,200);
+	QColor normalColor(0x4c,0x4c,0xcc,200);
+	QColor black(0x00, 0x00, 0x00, 200);
+	QColor white(0xff, 0xff, 0xff, 220);
 	for(int i=0; i<n; i++) {
 		for(int j=0; j<n; j++) {
 			QRect rect = pixelRect(i, j);
@@ -122,19 +130,12 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
 					painter.fillRect(rect, dark);
 					//painter.drawEllipse(QPoint(zoom*(i+1),zoom*(10-j)),s,s);
 			} else {
-				painter.fillRect(rect, Qt::white);
+				painter.fillRect(rect, white);
 			}
 		}
 	}
 
 	int ix,jx;
-//	QColor endColor(0x4c,0x4c,0xcc);
-	QColor endColor(0x90,0x00,0x90,200);
-	QColor startColor(0x33,0xff,0x00,200);
-	QColor capturedColor(0xff,0x33,0x33,200);
-	QColor normalColor(0x4c,0x4c,0xcc,200);
-	QColor black(0x00, 0x00, 0x00, 200);
-	QColor white(0xff, 0xff, 0xff, 200);
 
 	if(v.size()) {
 		int type;
