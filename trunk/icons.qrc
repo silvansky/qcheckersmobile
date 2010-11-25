@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/exit.png</file>
+        <file>icons/close.png</file>
+        <file>icons/new.png</file>
+        <file>icons/preferences.png</file>
+        <file>bg_desktop.png</file>
+        <file>bg_symbian.png</file>
+    </qresource>
+</RCC>

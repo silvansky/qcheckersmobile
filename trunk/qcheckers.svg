@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="44px" height="44px">
+  <defs>
+    <linearGradient id="lg">
+      <stop style="stop-color: #000000; stop-opacity: 1;" offset="0"/>
+      <stop style="stop-color: #000000; stop-opacity: 1;" offset="0.5"/>
+      <stop style="stop-color: #9f9f9f; stop-opacity: 1;" offset="1"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="44" height="44" stroke="none" fill="#000000" />
+  <rect x="1" y="1" width="42" height="42" stroke="none" fill="#ffffff" />
+  <rect x="1" y="1" width="21" height="21" stroke="none" fill="#cccccc" />
+  <rect x="22" y="22" width="21" height="21" stroke="none" fill="#cccccc" />
+  <circle cx="11" cy="11" r="8" stroke="black" stroke-width="2" fill="white"/>
+  <circle cx="33" cy="33" r="8" stroke="black" stroke-width="2" fill="#222222"/>
+</svg>
