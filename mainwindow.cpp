@@ -1,13 +1,13 @@
 #include "mainwindow.h"
 #include <QStackedLayout>
 #include <QLabel>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	setupUi(this);
 
 	game = new CheckersGame;
-	dialog = new SettingsDialog;
 
 	// Signal-Slots
 	connect(actionOpen, SIGNAL(triggered()), this, SLOT(open()));
@@ -48,12 +48,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	actionSave->setEnabled(false);
 	actionEndGame->setEnabled(false);
 	greeting = statusLabel->text();
+	// settings
+	spinBox->setMinimum(3);
+	spinBox->setMaximum(7);
+	comboBox->addItem(tr("Russian"));
+	comboBox->addItem(tr("International"));
+	comboBoxColor->addItem(tr("White"));
+	comboBoxColor->addItem(tr("Black"));
+	settingsPage->setVisible(false);
+	connect(ok, SIGNAL(clicked()), SLOT(saveSettings()));
+	connect(cancel, SIGNAL(clicked()), SLOT(hideSettings()));
 }
 
 MainWindow::~MainWindow()
 {
 	delete game;
-	delete dialog;
 }
 
 void MainWindow::open() {
@@ -81,7 +90,7 @@ void MainWindow::startNewGame() {
 
 	actionEndGame->setEnabled(true);
 	stackedWidget->setCurrentIndex(0);
-	page_2->setVisible(false);
+	menuPage->setVisible(false);
 	statusLabel->setText(greeting);
 }
 
@@ -90,26 +99,73 @@ void MainWindow::endGame() {
 	game->endGame();
 	picture->clear();
 	actionStartNewGame->setEnabled(true);
-	page_2->setVisible(true);
+	menuPage->setVisible(true);
 	stackedWidget->setCurrentIndex(1);
 }
 
 void MainWindow::gameEnded(uint8 status) {
 	if(status == myColor)
-		statusLabel->setText("YOU WIN! =)");
+		statusLabel->setText("YOU WON! =)");
 	else
 		statusLabel->setText("YOU LOSE! =(");
 	endGame();
 }
 
 void MainWindow::settings() {
-#ifdef Q_WS_S60
-	dialog->setWindowOpacity(0.7);
-	dialog->showFullScreen();
-#else
-	dialog->adjustSize();
-	dialog->show();
-#endif
+	loadSettings();
+	menuPage->setVisible(false);
+	settingsPage->setVisible(true);
+	stackedWidget->setCurrentIndex(2);
+}
+
+void MainWindow::hideSettings() {
+	menuPage->setVisible(true);
+	settingsPage->setVisible(false);
+	stackedWidget->setCurrentIndex(1);
+}
+
+void MainWindow::saveSettings() {
+	QSettings settings("Arceny","QCheckers");
+	int color, type, depth;
+	if( comboBox->currentIndex() == 0 )
+		type = RUSSIAN;
+	else
+		type = INTERNATIONAL;
+	if( comboBoxColor->currentIndex() == 0)
+		color = WHITE;
+	else
+		color = BLACK;
+	depth = spinBox->value();
+	settings.setValue("color",color);
+	settings.setValue("depth",depth);
+	settings.setValue("type",type);
+	hideSettings();
+}
+
+void MainWindow::loadSettings() {
+	QSettings settings("Arceny","QCheckers");
+
+	int color = settings.value("color",WHITE).toInt();
+	if(color != WHITE && color !=BLACK)
+		color = WHITE;
+	int type = settings.value("type",RUSSIAN).toInt();
+	if( type != RUSSIAN && type!= INTERNATIONAL )
+		type = RUSSIAN;
+	int depth = settings.value("depth",3).toInt();
+	if( depth < 3 || depth > 7)
+		depth = 3;
+
+	if( type == INTERNATIONAL )
+		comboBox->setCurrentIndex(1);
+	else
+		comboBox->setCurrentIndex(0);
+
+	if( color == BLACK )
+		comboBoxColor->setCurrentIndex(1);
+	else
+		comboBoxColor->setCurrentIndex(0);
+
+	spinBox->setValue(depth);
 }
 
 void MainWindow::about() {
