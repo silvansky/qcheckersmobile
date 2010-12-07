@@ -92,6 +92,8 @@ void CheckersGame::endGame() {
 
 // порождающая процедура для заданного состояния и цвета фишек игрока
 void CheckersGame::pp(CheckersState * state, uint8 color) {
+	if (!gamerunning)
+		return;
 	//QVector < std::vector <point> > vpp;
 	std::vector <point> vp;
 	capturefound = false;
@@ -618,8 +620,8 @@ bool CheckersGame::move(point p1, point p2) {
 
 //			std::cout << "Created: " << created << " Deleted: " << cleared << " FUCK:" << created-cleared <<"\n";	std::cout.flush();
 			if(checkTerminatePosition(current)) {
-				emit gameEnded( whoWin(current) );
 				gamerunning = false;
+				emit gameEnded( whoWin(current) );
 			}
 			return true;
 		}

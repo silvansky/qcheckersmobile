@@ -4,10 +4,10 @@
 #include "checkersgame.h"
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SettingsDialog)
+	QDialog(parent),
+	ui(new Ui::SettingsDialog)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 	ui->spinBox->setMinimum(3);
 	ui->spinBox->setMaximum(7);
 	ui->comboBox->addItem(tr("Russian"));
@@ -16,15 +16,17 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 	ui->comboBoxColor->addItem(tr("Black"));
 
 	loadSettings();
-//	connect( ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(saveSettings()) );
-//	connect( ui->comboBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(saveSettings()) );
-//	connect( ui->spinBox, SIGNAL(valueChanged(int)), this, SLOT(saveSettings()) );
+	//	connect( ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(saveSettings()) );
+	//	connect( ui->comboBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(saveSettings()) );
+	//	connect( ui->spinBox, SIGNAL(valueChanged(int)), this, SLOT(saveSettings()) );
+	connect(ui->cancel, SIGNAL(clicked()), SLOT(reject()));
+	connect(ui->ok, SIGNAL(clicked()), SLOT(accept()));
 	connect( this, SIGNAL(accepted()), this, SLOT(saveSettings()));
 }
 
 SettingsDialog::~SettingsDialog()
 {
-    delete ui;
+	delete ui;
 }
 
 void SettingsDialog::loadSettings() {
@@ -72,12 +74,12 @@ void SettingsDialog::saveSettings() {
 
 void SettingsDialog::changeEvent(QEvent *e)
 {
-    QDialog::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+	QDialog::changeEvent(e);
+	switch (e->type()) {
+	case QEvent::LanguageChange:
+		ui->retranslateUi(this);
+		break;
+	default:
+		break;
+	}
 }

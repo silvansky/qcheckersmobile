@@ -25,11 +25,11 @@ private slots:
 	void settings();
 	void about();
 	void gameEnded(uint8 status);
-//	void setCounts(State * state);
-//	void winned (bool color);
 private:
 	CheckersGame * game;
 	SettingsDialog * dialog;
+	int myColor;
+	QString greeting;
 };
 
 #endif // MAINWINDOW_H
