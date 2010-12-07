@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include <QStackedLayout>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -25,24 +27,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	connect(game, SIGNAL(vectorDeleted()), picture, SLOT(deleteVector()));
 //
 	connect(game, SIGNAL(gameEnded(uint8)), this, SLOT(gameEnded(uint8)));
+	QStackedLayout * sl = qobject_cast<QStackedLayout *>(stackedWidget->layout());
+	if (sl)
+		sl->setStackingMode(QStackedLayout::StackAll);
 
-//	connect(goFirst, SIGNAL(clicked()), game, SLOT(historyShowFirst()));
-//	connect(goLast, SIGNAL(clicked()), game, SLOT(historyShowLast()));
-//	connect(goPrev, SIGNAL(clicked()), game, SLOT(historyShowPrev()));
-//	connect(goNext, SIGNAL(clicked()), game, SLOT(historyShowNext()));
+	tbNew->setDefaultAction(actionStartNewGame);
+	tbSettings->setDefaultAction(actionSettings);
+	tbExit->setDefaultAction(actionExit);
+
+	QWidget * spacer = new QWidget(toolBar);
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+	toolBar->insertWidget(actionEndGame, spacer);
 
 	setWindowTitle(tr("QCheckers"));
+#ifndef Q_WS_S60
 	resize(800,600);
+#endif
 
 	actionOpen->setEnabled(false);
 	actionSave->setEnabled(false);
 	actionEndGame->setEnabled(false);
-
-//	goFirst->setEnabled(false);
-//	goLast->setEnabled(false);
-//	goPrev->setEnabled(false);
-//	goNext->setEnabled(false);
-
+	greeting = statusLabel->text();
 }
 
 MainWindow::~MainWindow()
@@ -52,21 +57,20 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::open() {
-
+	// TODO: open saved game
 }
 
 void MainWindow::save() {
-
+	// TODO: save current game
 }
 
 void MainWindow::startNewGame() {
 	QSettings settings("Arceny","QCheckers");
 	actionStartNewGame->setEnabled(false);
 	int type = settings.value("type",RUSSIAN).toInt();
-	int color = settings.value("color",WHITE).toInt();
+	int color = myColor = settings.value("color",WHITE).toInt();
 	int level = settings.value("depth",3).toInt();
-	//std::cout << type << " " << color << "\n"; std::cout.flush();
-	if(color == WHITE)
+	if (color == WHITE)
 		color = BLACK;
 	else
 		color = WHITE;
@@ -76,10 +80,9 @@ void MainWindow::startNewGame() {
 	game->startNewGame(color);
 
 	actionEndGame->setEnabled(true);
-//	goFirst->setEnabled(true);
-//	goLast->setEnabled(true);
-//	goPrev->setEnabled(true);
-//	goNext->setEnabled(true);
+	stackedWidget->setCurrentIndex(0);
+	page_2->setVisible(false);
+	statusLabel->setText(greeting);
 }
 
 void MainWindow::endGame() {
@@ -87,36 +90,26 @@ void MainWindow::endGame() {
 	game->endGame();
 	picture->clear();
 	actionStartNewGame->setEnabled(true);
-//	goFirst->setEnabled(false);
-//	goLast->setEnabled(false);
-//	goPrev->setEnabled(false);
-//	goNext->setEnabled(false);
+	page_2->setVisible(true);
+	stackedWidget->setCurrentIndex(1);
 }
 
-//void MainWindow::setCounts(State * state) {
-/*	whitePiecesBox->setValue(state->counts[0]);
-	blackPiecesBox->setValue(state->counts[3]);
-	whiteKingsBox->setValue(state->counts[1]);
-	blackKingsBox->setValue(state->counts[4]);
-	whiteMovesBox->setValue(state->counts[2]);
-	blackMovesBox->setValue(state->counts[5]);
-	*/
-//}
-
 void MainWindow::gameEnded(uint8 status) {
-	if(status == WHITE)
-	QMessageBox::information(this, tr("White win!"),
-							tr("White win!") );
-	if(status == BLACK)
-	QMessageBox::information(this, tr("Black win!"),
-							tr("Black win!") );
-	//endGame();
+	if(status == myColor)
+		statusLabel->setText("YOU WIN! =)");
+	else
+		statusLabel->setText("YOU LOSE! =(");
+	endGame();
 }
 
 void MainWindow::settings() {
-	//SettingsDialog dialog(this);
+#ifdef Q_WS_S60
+	dialog->setWindowOpacity(0.7);
+	dialog->showFullScreen();
+#else
 	dialog->adjustSize();
-	dialog->exec();
+	dialog->show();
+#endif
 }
 
 void MainWindow::about() {
