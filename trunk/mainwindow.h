@@ -6,7 +6,6 @@
 
 #include "ui_mainwindow.h"
 //#include "state.h"
-#include "settingsdialog.h"
 #include "checkersgame.h"
 #include "checkersstate.h"
 
@@ -23,11 +22,13 @@ private slots:
 	void startNewGame();
 	void endGame();
 	void settings();
+	void hideSettings();
 	void about();
 	void gameEnded(uint8 status);
+	void saveSettings();
+	void loadSettings();
 private:
 	CheckersGame * game;
-	SettingsDialog * dialog;
 	int myColor;
 	QString greeting;
 };
