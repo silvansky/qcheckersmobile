@@ -49,7 +49,7 @@ void CheckersState::print() {
 	for(int j = n/2-1; j>=0; j--)
 	{
 		//for(int i=1; i<n; i+=2)
-			//std::cout << " _ " << (unsigned int)data[i][j] << " ";
+		//std::cout << " _ " << (unsigned int)data[i][j] << " ";
 		//std::cout << std::endl;
 		//for(int i=0; i<n; i+=2)
 		//	std::cout << " " << (unsigned int)data[i][j] << " _ ";
@@ -77,27 +77,27 @@ CheckersState * CheckersState::genNextState(std::vector <point> & v) {
 		uint8 i = v.at(k).x;
 		uint8 j = v.at(k).y;
 		switch(v.at(k).type) {
-			case(MOVEDFROM):
-				tmp = state->at(i,j);
-				state->at(i,j) = 0;
-				break;
-			case(MOVEDTO):
-				state->at(i,j) = tmp;
-				break;
-			case(MARKDELETED):
-				state->at(i,j) = MARKDELETED;
-				break;
-			case(DELETED):
-				state->at(i,j) = 0;
-				break;
-			case(TOKING):
-				if( tmp == WHITE )
-					state->at(i,j) = WHITEKING;
-				if( tmp == BLACK )
-					state->at(i,j) = BLACKKING;
-				break;
-			default:
-				break;
+		case(MOVEDFROM):
+			tmp = state->at(i,j);
+			state->at(i,j) = 0;
+			break;
+		case(MOVEDTO):
+			state->at(i,j) = tmp;
+			break;
+		case(MARKDELETED):
+			state->at(i,j) = MARKDELETED;
+			break;
+		case(DELETED):
+			state->at(i,j) = 0;
+			break;
+		case(TOKING):
+			if( tmp == WHITE )
+				state->at(i,j) = WHITEKING;
+			if( tmp == BLACK )
+				state->at(i,j) = BLACKKING;
+			break;
+		default:
+			break;
 		}
 	}
 	state->move() = v;

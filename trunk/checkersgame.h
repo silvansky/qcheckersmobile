@@ -22,6 +22,7 @@ public:
 	void setMaxLevel(int level);
 	void startNewGame(uint8 color);		// начинает новую игру, аргумент - цвет шашек компьютера
 	void endGame();
+	CheckersState * currentState() { return current; };
 public slots:
 	void setClicked(int i, int j);
 signals:
@@ -29,6 +30,8 @@ signals:
 	void vectorChanged(std::vector <point> & v);
 	void vectorDeleted();
 	void gameEnded(uint8);
+	void startThinking();
+	void stopThinking();
 private:
 	void firstClick(int i, int j);		// игрок кликнул мышкой первый раз
 	void secondClick(int i, int j);		// игрок кликнул мышкой второй раз
@@ -53,7 +56,6 @@ private:
 	std::vector <CheckersState *> movesearch;
 	std::vector < point > tmpvector;	// временный вектор для хранения разных точек
 	point tmppoint;
-	void printPointVector(std::vector <point> & v);
 
 	CheckersState * first;			// первое состояние игры
 	CheckersState * current;		// текущее состояние игры

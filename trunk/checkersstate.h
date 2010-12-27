@@ -9,8 +9,8 @@
 typedef unsigned char uint8;
 
 enum checker {
-	WHITE = 1,				// белая шашка
-	BLACK = 2,				// черная шашка
+	WHITE = 1,			// белая шашка
+	BLACK = 2,			// черная шашка
 	WHITEKING = 3,			// белая дамка
 	BLACKKING = 4,			// черная дамка
 	WHITECELL = 10,			// неходовая клетка, i%2 != j%2
@@ -20,7 +20,7 @@ enum checker {
 	MOVEDTHROUGH = 22,		// прошла через
 	DELETED = 23,			// побита
 	MARKDELETED = 24,		// отмечена как побитая
-	TOKING = 25				// превращение в дамку
+	TOKING = 25			// превращение в дамку
 };
 
 class point {
@@ -36,7 +36,7 @@ public:
 	uint8 x;
 	uint8 y;
 	uint8 type;
-bool operator == (const point & p ) {
+	bool operator == (const point & p ) {
 		if( x==p.x && y==p.y && type==p.type )
 			return true;
 		return false;
@@ -46,21 +46,20 @@ bool operator == (const point & p ) {
 class CheckersState
 {
 public:
-    CheckersState();
+	CheckersState();
 	CheckersState(uint8 size);
 	~CheckersState();
 	CheckersState(const CheckersState &source);
 	CheckersState(const CheckersState *source);
 
 	CheckersState * genNextState(std::vector <point> & v);	// пораждает новое состояние из текущего.
-															// принимает в качестве аргумента вектор ходов
+	// принимает в качестве аргумента вектор ходов
 	void setParent(CheckersState * parent);
-	//void calcCounts();										// рассчитывает число фишек
 	std::vector <uint8> & counts();
 	CheckersState * parent();
 	std::vector < CheckersState * > & childs();
 	std::vector < point > & move();
-	int & deletedAtMove();									// количество фишек противника, побитых в результате перехода в это состояние
+	int & deletedAtMove(); // количество фишек противника, побитых в результате перехода в это состояние
 	int & score();
 	void print();
 	uint8 size();
@@ -73,8 +72,8 @@ public:
 private:
 	CheckersState * p;
 	std::vector < CheckersState * > xchilds;
-	std::vector < point > xmove;								// описание одного хода от родителя к данному состоянию
-	std::vector < uint8 > xcounts;								// количество фишек разных типов
+	std::vector < point > xmove;		// описание одного хода от родителя к данному состоянию
+	std::vector < uint8 > xcounts;		// количество фишек разных типов
 	void allocate(uint8 size);
 	uint8 ** data;
 	uint8 n;
