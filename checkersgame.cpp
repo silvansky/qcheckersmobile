@@ -1,5 +1,6 @@
 #include "checkersgame.h"
 #include <time.h>
+#include <QDebug>
 
 CheckersGame::CheckersGame()
 {
@@ -10,7 +11,7 @@ CheckersGame::CheckersGame()
 	current = NULL;
 	first = NULL;
 	current = NULL;
-//	maxlevel = 3;
+	//	maxlevel = 3;
 }
 
 CheckersGame::~CheckersGame() {
@@ -70,9 +71,8 @@ void CheckersGame::startNewGame(uint8 color) {
 		go();
 	} else {
 		emit stateChanged(current);
+		qDebug() << "sc1";
 		pp(current,humancolor);
-		//std::cout << "Created: " << created << " Deleted: " << cleared << "\n"; std::cout.flush();
-		//evaluation(current);
 	}
 }
 
@@ -84,10 +84,10 @@ void CheckersGame::endGame() {
 		clearTree(current, true, true);
 		current = NULL;
 	}
-//	if(first) {
-//		delete first;
-		first = NULL;
-//	}
+	//	if(first) {
+	//		delete first;
+	first = NULL;
+	//	}
 }
 
 // порождающая процедура для заданного состояния и цвета фишек игрока
@@ -141,8 +141,8 @@ void CheckersGame::pp(CheckersState * state, uint8 color) {
 				movesearch.at(i)->at( it->x, it->y ) = 0;
 		}
 		movesearch.at(i)->setParent(state);
-//		if(lastlevel)
-//			movesearch.at(i)->score() = evaluation( movesearch.at(i) );
+		//		if(lastlevel)
+		//			movesearch.at(i)->score() = evaluation( movesearch.at(i) );
 		state->childs().push_back( movesearch.at(i) );
 	}
 	movesearch.clear();
@@ -245,7 +245,7 @@ int CheckersGame::searchMove(CheckersState *state, int i, int j, std::vector <po
 				}
 				vpp.push_back(tmp_vp);
 				normmoves ++;
-//				std::cout << "Can move to " << (int)xi << " " << (int)xj << " \n"; std::cout.flush();
+				//				std::cout << "Can move to " << (int)xi << " " << (int)xj << " \n"; std::cout.flush();
 			} else {
 				break;
 			}
@@ -273,13 +273,13 @@ int CheckersGame::searchMove(CheckersState *state, int i, int j, std::vector <po
 			}
 			// если найдена фишка, которую предположительно можно побить
 			if(captureflag) {
-					// если непустая клетка то побить не можем
+				// если непустая клетка то побить не можем
 				if( !state->isNull(xi,xj) ) {
 					captureflag = false;
 					break;
 				}
 				// построение нового состояния, запуск поиска возможного следующего боя из этого состояния
-//				std::cout << "Can capture at " << (int)cp.x << " " << (int)cp.y << " and move to " << (int)xi << " " << (int)xj << "\n"; std::cout.flush();
+				//				std::cout << "Can capture at " << (int)cp.x << " " << (int)cp.y << " and move to " << (int)xi << " " << (int)xj << "\n"; std::cout.flush();
 				capturefound = true;
 				delmoves++;
 
@@ -337,11 +337,11 @@ int CheckersGame::searchMove(CheckersState *state, int i, int j, std::vector <po
 
 // процедура шага компьютера из текущего состояния
 void CheckersGame::go() {
-//	maxlevel = 3;
+	//	maxlevel = 3;
 	//CheckersState * root;
-//	alpha = -9999; beta = 9999;
+	//	alpha = -9999; beta = 9999;
 	goRecursive(current, 1, -9999, 9999);
-//	std::cout << alpha << " " << beta << "\n"; std::cout.flush();
+	//	std::cout << alpha << " " << beta << "\n"; std::cout.flush();
 	/// выбор из потомков самого лучшего
 	int xmax = -9999;
 	int id = 0;
@@ -359,7 +359,7 @@ void CheckersGame::go() {
 	}
 	id = rand() % tmp.size();
 	//std::cout << tmp.size() << "\n";
-//	id = 0;
+	//	id = 0;
 	//CheckersState tmp = current->childs().at(i);
 	move( tmp.at(id)->move().front(), tmp.at(id)->move().back() );
 	pp(current,humancolor);
@@ -384,7 +384,6 @@ int CheckersGame::goRecursive(CheckersState *state, int level, int alpha, int be
 	for(i=0; i< state->childs().size(); i++) {
 		alpha = std::max( alpha, - goRecursive( state->childs().at(i), level+1 , -beta, -alpha ) );
 		if ( beta < alpha ) {
-//			std::cout << "Removing tree :-)\n"; std::cout.flush();
 			break;
 		}
 	}
@@ -412,59 +411,74 @@ bool CheckersGame::checkCoordinate(char x) {
 }
 
 /*
-	  0            1                 2              3            4                5               6                 7
+   0            1                 2              3            4                5               6                 7
 белых_шашек | белых_дамок | былых перемещений | белых боёв | чёрных шашек | чёрных дамок | чёрных перемещений | чёрных боёв
 */
-void CheckersGame::calcCounts(CheckersState * state) {
+void CheckersGame::calcCounts(CheckersState * state)
+{
 	std::vector <CheckersState *> tmp;
-//	 если уже что-то посчитано, то пораждающая процедура была выполнена ранее для
-//	 одного из цветов
-//	int kkk = -1;
-//	if(state->childs().size()) {
-//		tmp = state->childs();
-//		kkk = tmp.at(0)->color(tmp.at(0)->move().at(0).x , tmp.at(0)->move().at(0).y);
-//	}
+	//	 если уже что-то посчитано, то пораждающая процедура была выполнена ранее для
+	//	 одного из цветов
+	//	int kkk = -1;
+	//	if(state->childs().size()) {
+	//		tmp = state->childs();
+	//		kkk = tmp.at(0)->color(tmp.at(0)->move().at(0).x , tmp.at(0)->move().at(0).y);
+	//	}
 	state->counts().clear();
 	state->counts().resize(8,0);
-//	uint8 x[2] = {WHITE, BLACK};
-//	for(unsigned k=0; k<2; k++) {
-//		if( x[k] != kkk ) {
-//			pp(state, x[k]);
-//			state->counts()[2+k*4] = state->childs().size();
-//			for(unsigned i=0; i < state->childs().size(); i++)
-//				state->counts()[3+k*4] += state->childs().at(i)->deletedAtMove();
-//			clearTree(state,true,true);
-//		} else {
-//			state->counts()[2+k*4] = tmp.size();
-//			for(unsigned i=0; i < tmp.size(); i++)
-//				state->counts()[3+k*4] += tmp.at(i)->deletedAtMove();
-//		}
-//	}
+	//	uint8 x[2] = {WHITE, BLACK};
+	//	for(unsigned k=0; k<2; k++) {
+	//		if( x[k] != kkk ) {
+	//			pp(state, x[k]);
+	//			state->counts()[2+k*4] = state->childs().size();
+	//			for(unsigned i=0; i < state->childs().size(); i++)
+	//				state->counts()[3+k*4] += state->childs().at(i)->deletedAtMove();
+	//			clearTree(state,true,true);
+	//		} else {
+	//			state->counts()[2+k*4] = tmp.size();
+	//			for(unsigned i=0; i < tmp.size(); i++)
+	//				state->counts()[3+k*4] += tmp.at(i)->deletedAtMove();
+	//		}
+	//	}
 	int movescount;
-	for(unsigned i=0; i<n; i++) {
-		for(unsigned j=0; j<n; j++) {
+	for(unsigned i=0; i<n; i++)
+	{
+		for(unsigned j=0; j<n; j++)
+		{
 			if(i%2!=j%2)
 				continue;
 			movescount = movesCount(state, i, j);
-			if(state->at(i,j)==WHITE) {
+			switch(state->at(i, j))
+			{
+			case WHITE:
+			{
 				state->counts()[0]++;
 				state->counts()[2] += movescount;
+				break;
 			}
-			if(state->at(i,j)==WHITEKING) {
+			case WHITEKING:
+			{
 				state->counts()[1]++;
 				state->counts()[2] += movescount;
+				break;
 			}
-			if(state->at(i,j)==BLACK) {
+			case BLACK:
+			{
 				state->counts()[4]++;
 				state->counts()[6] += movescount;
+				break;
 			}
-			if(state->at(i,j)==BLACKKING) {
+			case BLACKKING:
+			{
 				state->counts()[5]++;
 				state->counts()[6] += movescount;
+				break;
+			}
 			}
 		}
 	}
-	if(tmp.size()) {
+	if(tmp.size())
+	{
 		state->childs() = tmp;
 	}
 }
@@ -477,19 +491,20 @@ int CheckersGame::evaluation(CheckersState * state) {
 	evaluation += 4 * ( state->counts()[0] - state->counts()[4] );
 	evaluation += 6 * ( state->counts()[1] - state->counts()[5] );
 	evaluation += ( state->counts()[2] - state->counts()[6] );
-//	evaluation += 2 * ( state->counts()[3] - state->counts()[7] );
-//	for(unsigned i=0; i< state->counts().size(); i++)
-//		std::cout << (int)state->counts().at(i) << " ";
-//	std::cout << "\n"; std::cout.flush();
+	//	evaluation += 2 * ( state->counts()[3] - state->counts()[7] );
+	//	for(unsigned i=0; i< state->counts().size(); i++)
+	//		std::cout << (int)state->counts().at(i) << " ";
+	//	std::cout << "\n"; std::cout.flush();
 	return evaluation;
 }
 
-bool CheckersGame::checkTerminatePosition(CheckersState * state) {
+bool CheckersGame::checkTerminatePosition(CheckersState * state)
+{
 	if(!state->counts().size())
 		calcCounts(state);
 	// если все фишки побиты
 	if ( !(state->counts()[0]+state->counts()[1]) ||
-		 !(state->counts()[4]+state->counts()[5]) )
+			!(state->counts()[4]+state->counts()[5]) )
 		return true;
 	// если все фишки блокированы
 	if( !state->counts()[2] || !state->counts()[6] )
@@ -508,8 +523,8 @@ uint8 CheckersGame::whoWin(CheckersState *state) {
 // рекурсивная очистка дерева состояний
 void CheckersGame::clearTree(CheckersState * state, bool clearlists, bool onlychilds) {
 	//
-//	if( !state )
-//		return;
+	//	if( !state )
+	//		return;
 	if (onlychilds) {		// если очищаем только детей, не удаляя корневой узел
 		for(unsigned i =0; i < state->childs().size(); i++) {
 			clearTreeRecursive( state->childs().at(i), clearlists ); // удаляем всех детей
@@ -537,17 +552,8 @@ void CheckersGame::clearTreeRecursive(CheckersState * state, bool clearlists) {
 	}
 }
 
-void CheckersGame::printPointVector(std::vector <point> & v) {
-	for(unsigned i=0; i<v.size(); i++) {
-		//std::cout << (int)v.at(i).x << " " << (int)v.at(i).y << " " << (int)v.at(i).type << "\n";
-	}
-	//std::cout.flush();
-}
-
 void CheckersGame::setClicked(int i, int j) {
 	if(i>=0 && i<n && j>=0 && j<n && i%2==j%2 && gamerunning) {
-		//std::cout << "Clicked at " << (int)i << " " << (int)j << " = "<< (int)current->at(i,j) << std::endl;
-		//click++;
 		if(click == 0)
 			firstClick(i, j);
 		else
@@ -560,10 +566,8 @@ void CheckersGame::setClicked(int i, int j) {
 
 void CheckersGame::firstClick(int i, int j) {
 	if( (humancolor == current->color(i,j))) {
-		//std::cout << "Click 0" << "\n"; std::cout.flush();
 		tmppoint.x = i; tmppoint.y = j; tmppoint.type = MOVEDFROM;
 		tmpvector.clear();
-		//click = 1;
 		for(unsigned ii=0; ii< current->childs().size(); ii++ ) {
 			if( current->childs().at(ii)->move().at(0) == tmppoint ) {
 				for( unsigned jj=0; jj<current->childs().at(ii)->move().size(); jj++ ) {
@@ -580,12 +584,9 @@ void CheckersGame::firstClick(int i, int j) {
 	emit vectorDeleted();
 }
 
-void CheckersGame::secondClick(int i, int j) {
-	//std::cout << "Click 1" << "\n"; std::cout.flush();
+void CheckersGame::secondClick(int i, int j)
+{
 	bool move = false;
-//	if ( (tmppoint.x == i && tmppoint.y == j) ) {
-//		return;
-//	}
 	if( current->isNull(i,j) || (tmppoint.x == i && tmppoint.y == j))
 		move = this->move( tmppoint , point(i,j,MOVEDTO) );
 	if( !move ) {
@@ -593,33 +594,36 @@ void CheckersGame::secondClick(int i, int j) {
 		firstClick(i, j);
 	} else {
 		// ход успешен
-		//pp(current, humancolor);
 		if(gamerunning)
+		{
+			emit startThinking();
 			go(); // выполним ход компом
+		}
 		click = 0;
 	}
 }
 
-bool CheckersGame::move(point p1, point p2) {
-//	bool flag;
-	for(unsigned i=0; i< current->childs().size(); i++ ) {
+bool CheckersGame::move(point p1, point p2)
+{
+	for(unsigned i=0; i< current->childs().size(); i++ )
+	{
 		if( current->childs().at(i)->move().front() == p1 &&
-			current->childs().at(i)->move().back().x == p2.x &&
-			current->childs().at(i)->move().back().y == p2.y )
+				current->childs().at(i)->move().back().x == p2.x &&
+				current->childs().at(i)->move().back().y == p2.y )
 		{
-//			flag = true;
 			// выполнить операцию по переходу в новое состояние
-			//std::cout << "Move ok!!!\n"; std::cout.flush();
 			CheckersState * tmpstate = current->childs().at(i);
 			current->childs().erase(current->childs().begin()+i);
 			clearTree(current,true);
 			clearTree(tmpstate,true,true);
 			current = tmpstate;
-			tmp = new CheckersState(current); 	tmp->childs().clear();
+			tmp = new CheckersState(current);
+			tmp->childs().clear();
 			emit stateChanged(current);
+			emit stopThinking();
 
-//			std::cout << "Created: " << created << " Deleted: " << cleared << " FUCK:" << created-cleared <<"\n";	std::cout.flush();
-			if(checkTerminatePosition(current)) {
+			if(checkTerminatePosition(current))
+			{
 				gamerunning = false;
 				emit gameEnded( whoWin(current) );
 			}
@@ -627,7 +631,6 @@ bool CheckersGame::move(point p1, point p2) {
 		}
 	}
 	return false;
-//	return flag;
 }
 
 

@@ -6,5 +6,8 @@
         <file>icons/preferences.png</file>
         <file>bg_desktop.png</file>
         <file>bg_symbian.png</file>
+        <file>icons/white.png</file>
+        <file>icons/black.png</file>
+        <file>hourglass.png</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 #include "checkerspicture.h"
+#include <QDebug>
 
-CheckersPicture::CheckersPicture(QWidget *parent) : QWidget(parent)
+CheckersPicture::CheckersPicture(QWidget *parent) : QWidget(parent), hourglass(":/hourglass.png")
 {
 	QPalette pal = palette();
 	pal.setColor(QPalette::Light,QColor(0x87,0xa1,0xc0, 0));
@@ -15,11 +16,9 @@ CheckersPicture::CheckersPicture(QWidget *parent) : QWidget(parent)
 	curstate = NULL;
 	n = 8;
 	setMinimumSize(zoom*(n+1),zoom*(n+1));
+	showHourglass = true;
 
-	// flags
-//	mouseClickFlag = true;
-//	isWhite = false;				// комп играет белым?
-//	isWhite = true;
+	thinking = false;
 }
 
 CheckersPicture::~CheckersPicture()
@@ -41,7 +40,8 @@ void CheckersPicture::setState(CheckersState * state) {
 		n = state->size();
 		v.clear();
 		//mouseClickFlag = true;
-		update();
+		//update();
+		repaint();
 	} else {
 		clear();
 	}
@@ -64,10 +64,23 @@ void CheckersPicture::setVector(std::vector <point> & v) {
 	update();
 }
 
-void CheckersPicture::clear() {
+void CheckersPicture::clear()
+{
 	curstate = NULL;
 	v.clear();
 	update();
+}
+
+void CheckersPicture::startThinking()
+{
+	thinking = true;
+	repaint();
+}
+
+void CheckersPicture::stopThinking()
+{
+	thinking = false;
+	repaint();
 }
 
 void CheckersPicture::mousePressEvent(QMouseEvent *event)
@@ -80,7 +93,7 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
 		qreal i = (event->pos().x() - p.x()) * (n)/side;
 		qreal j = (double)n - (event->pos().y() - p.y()) * (n)/side - 1;
 		//qDebug() << (int)i << " " << (int)j;
-		if(color==BLACK)
+		if (color==BLACK)
 			emit mouseClicked((int)i,(int)j);
 		else
 			emit mouseClicked(n -1 - (int)i, n - 1 - (int)j);
@@ -95,28 +108,13 @@ void CheckersPicture::mouseMoveEvent(QMouseEvent *event)
 void CheckersPicture::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
-//#ifdef Q_WS_S60
-//	QImage bg(":/bg_symbian.png");
-//#else
-//	QImage bg(":/bg_desktop.png");
-//#endif
-//	painter.drawImage(0, 0, bg);
+
 	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setViewport(p.x(),p.y(),side,side);
 	painter.setWindow(0, 0, zoom*(n), zoom*(n));
 
-/*
-	QColor border(0xce,0x5c,0x00);
-	painter.fillRect(QRect(0,0,zoom*(n+1.0),zoom*0.5), border);
-	painter.fillRect(QRect(0,zoom*(n+0.5),zoom*(n+1.0),zoom*0.5), border);
-	painter.fillRect(QRect(0,0,zoom*(0.5),zoom*(n+1.0)), border);
-	painter.fillRect(QRect(zoom*(n+0.5),0,zoom*0.5,zoom*(n+1.0)), border);
-*/
-
 	QColor dark(0xcc,0xcc,0xcc,200);
 
-
-//	QColor endColor(0x4c,0x4c,0xcc);
 	QColor endColor(0x90,0x00,0x90,200);
 	QColor startColor(0x33,0xff,0x00,200);
 	QColor capturedColor(0xff,0x33,0x33,200);
@@ -188,6 +186,11 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
 			}
 		}
 	}
+	if (thinking && showHourglass)
+	{
+		painter.setWindow(painter.viewport());
+		painter.drawImage((width() - hourglass.width()) / 2, (height() - hourglass.height()) / 2, hourglass);
+	}
 }
 
 void CheckersPicture::resizeEvent (QResizeEvent * event) {
@@ -195,6 +198,7 @@ void CheckersPicture::resizeEvent (QResizeEvent * event) {
 		update();
 		side = qMin(width(), height());
 		p = QPoint((width() - side) / 2, (height() - side) / 2);
+		hourglass = QImage(":/hourglass.png").scaledToHeight(side, Qt::SmoothTransformation);
 	} else {
 		event->ignore();
 	}

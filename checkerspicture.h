@@ -29,13 +29,18 @@ public:
 	~CheckersPicture();
 	CheckersState * state();
 	void setComputerColor(uint8 color);
+	void setShowHourglass(bool show)
+	{
+		showHourglass = show;
+	}
 public slots:
 	void setState(CheckersState *state);
-//	void setVector(QVector <SearchTreeList *> & v);
 	void setVector(std::vector <point> & v);
 	void deleteVector();
 	void setSize(int n);
 	void clear();
+	void startThinking();
+	void stopThinking();
 signals:
 	void mouseClicked(int, int);
 protected:
@@ -52,6 +57,9 @@ private:
 	int side;
 	int zoom;
 	int n;
+	bool thinking;
+	QImage hourglass;
+	bool showHourglass;
 
 	// flags
 	//bool mouseClickFlag;

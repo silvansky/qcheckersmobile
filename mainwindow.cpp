@@ -2,10 +2,40 @@
 #include <QStackedLayout>
 #include <QLabel>
 #include <QSettings>
+#include <QDateTime>
+#include <QTimer>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	setupUi(this);
+
+	whiteIcon = new QLabel;
+	statusToolBar->addWidget(whiteIcon);
+	whiteIcon->setPixmap(QPixmap(":/icons/white.png"));
+
+	whiteLabel = new QLabel;
+	statusToolBar->addWidget(whiteLabel);
+
+	blackIcon = new QLabel;
+	statusToolBar->addWidget(blackIcon);
+	blackIcon->setPixmap(QPixmap(":/icons/black.png"));
+
+	blackLabel = new QLabel;
+	statusToolBar->addWidget(blackLabel);
+
+	QWidget * spacer = new QWidget(toolBar);
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+	statusToolBar->addWidget(spacer);
+
+	timeLabel = new QLabel;
+	statusToolBar->addWidget(timeLabel);
+	timeLabel->setStyleSheet("color: black;");
+
+	time = new QTimer;
+	connect(time, SIGNAL(timeout()), SLOT(timeChanged()));
+	time->start(10000);
+	timeChanged();
 
 	game = new CheckersGame;
 
@@ -23,19 +53,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 	connect(picture, SIGNAL(mouseClicked(int, int)), game, SLOT(setClicked(int, int)));
 	connect(game, SIGNAL(stateChanged(CheckersState *)), picture, SLOT(setState(CheckersState *)));
+	connect(game, SIGNAL(stateChanged(CheckersState *)), SLOT(setState(CheckersState *)));
 	connect(game, SIGNAL(vectorChanged(std::vector <point> &)), picture, SLOT(setVector(std::vector <point> &)));
 	connect(game, SIGNAL(vectorDeleted()), picture, SLOT(deleteVector()));
-//
-	connect(game, SIGNAL(gameEnded(uint8)), this, SLOT(gameEnded(uint8)));
+	//
+	connect(game, SIGNAL(gameEnded(uint8)), SLOT(gameEnded(uint8)));
+	connect(game, SIGNAL(startThinking()), picture, SLOT(startThinking()));
+	connect(game, SIGNAL(stopThinking()), picture, SLOT(stopThinking()));
 	QStackedLayout * sl = qobject_cast<QStackedLayout *>(stackedWidget->layout());
 	if (sl)
 		sl->setStackingMode(QStackedLayout::StackAll);
+	stackedWidget->setCurrentIndex(1);
 
 	tbNew->setDefaultAction(actionStartNewGame);
 	tbSettings->setDefaultAction(actionSettings);
 	tbExit->setDefaultAction(actionExit);
 
-	QWidget * spacer = new QWidget(toolBar);
+	spacer = new QWidget(toolBar);
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
 	toolBar->insertWidget(actionEndGame, spacer);
 
@@ -50,14 +84,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	greeting = statusLabel->text();
 	// settings
 	spinBox->setMinimum(3);
-	spinBox->setMaximum(7);
+	spinBox->setMaximum(5);
 	comboBox->addItem(tr("Russian"));
 	comboBox->addItem(tr("International"));
 	comboBoxColor->addItem(tr("White"));
 	comboBoxColor->addItem(tr("Black"));
 	settingsPage->setVisible(false);
-	connect(ok, SIGNAL(clicked()), SLOT(saveSettings()));
-	connect(cancel, SIGNAL(clicked()), SLOT(hideSettings()));
+	actionSave_Settings->setVisible(false);
+	actionDiscard_Settings->setVisible(false);
+	connect(actionSave_Settings, SIGNAL(triggered()), SLOT(saveSettings()));
+	connect(actionDiscard_Settings, SIGNAL(triggered()), SLOT(hideSettings()));
+	loadSettings();
 }
 
 MainWindow::~MainWindow()
@@ -65,15 +102,18 @@ MainWindow::~MainWindow()
 	delete game;
 }
 
-void MainWindow::open() {
+void MainWindow::open()
+{
 	// TODO: open saved game
 }
 
-void MainWindow::save() {
+void MainWindow::save()
+{
 	// TODO: save current game
 }
 
-void MainWindow::startNewGame() {
+void MainWindow::startNewGame()
+{
 	QSettings settings("Arceny","QCheckers");
 	actionStartNewGame->setEnabled(false);
 	int type = settings.value("type",RUSSIAN).toInt();
@@ -94,16 +134,31 @@ void MainWindow::startNewGame() {
 	statusLabel->setText(greeting);
 }
 
-void MainWindow::endGame() {
+void MainWindow::setState(CheckersState * state)
+{
+	if (state->counts().size())
+	{
+		int whiteCount = state->counts().at(0) + state->counts().at(1);
+		int blackCount = state->counts().at(4) + state->counts().at(5);
+		whiteLabel->setText(QString("<b><font color=red>%1</font></b>").arg(whiteCount));
+		blackLabel->setText(QString("<b><font color=red>%1</font></b>").arg(blackCount));
+	}
+}
+
+void MainWindow::endGame()
+{
 	actionEndGame->setEnabled(false);
 	game->endGame();
-	picture->clear();
+	//picture->clear();
+	//picture->setState(game->currentState());
+	picture->stopThinking();
 	actionStartNewGame->setEnabled(true);
 	menuPage->setVisible(true);
 	stackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::gameEnded(uint8 status) {
+void MainWindow::gameEnded(uint8 status)
+{
 	if(status == myColor)
 		statusLabel->setText("YOU WON! =)");
 	else
@@ -111,20 +166,27 @@ void MainWindow::gameEnded(uint8 status) {
 	endGame();
 }
 
-void MainWindow::settings() {
+void MainWindow::settings()
+{
 	loadSettings();
 	menuPage->setVisible(false);
 	settingsPage->setVisible(true);
 	stackedWidget->setCurrentIndex(2);
+	actionSave_Settings->setVisible(true);
+	actionDiscard_Settings->setVisible(true);
 }
 
-void MainWindow::hideSettings() {
+void MainWindow::hideSettings()
+{
 	menuPage->setVisible(true);
 	settingsPage->setVisible(false);
 	stackedWidget->setCurrentIndex(1);
+	actionSave_Settings->setVisible(false);
+	actionDiscard_Settings->setVisible(false);
 }
 
-void MainWindow::saveSettings() {
+void MainWindow::saveSettings()
+{
 	QSettings settings("Arceny","QCheckers");
 	int color, type, depth;
 	if( comboBox->currentIndex() == 0 )
@@ -139,10 +201,15 @@ void MainWindow::saveSettings() {
 	settings.setValue("color",color);
 	settings.setValue("depth",depth);
 	settings.setValue("type",type);
+	settings.setValue("showHourglass", cbHourglass->isChecked());
+	settings.setValue("showStatusBar", cbStatusBar->isChecked());
+	statusToolBar->setVisible(cbStatusBar->isChecked());
+	picture->setShowHourglass(cbHourglass->isChecked());
 	hideSettings();
 }
 
-void MainWindow::loadSettings() {
+void MainWindow::loadSettings()
+{
 	QSettings settings("Arceny","QCheckers");
 
 	int color = settings.value("color",WHITE).toInt();
@@ -152,7 +219,7 @@ void MainWindow::loadSettings() {
 	if( type != RUSSIAN && type!= INTERNATIONAL )
 		type = RUSSIAN;
 	int depth = settings.value("depth",3).toInt();
-	if( depth < 3 || depth > 7)
+	if( depth < 3 || depth > 5)
 		depth = 3;
 
 	if( type == INTERNATIONAL )
@@ -164,17 +231,26 @@ void MainWindow::loadSettings() {
 		comboBoxColor->setCurrentIndex(1);
 	else
 		comboBoxColor->setCurrentIndex(0);
+	cbHourglass->setChecked(settings.value("showHourglass", true).toBool());
+	cbStatusBar->setChecked(settings.value("showStatusBar", true).toBool());
+	statusToolBar->setVisible(cbStatusBar->isChecked());
+	picture->setShowHourglass(cbHourglass->isChecked());
 
 	spinBox->setValue(depth);
+}
+
+void MainWindow::timeChanged()
+{
+	timeLabel->setText(QTime::currentTime().toString("HH:mm"));
 }
 
 void MainWindow::about() {
 	QMessageBox::about(this, trUtf8("About QCheckers"),
 			   trUtf8(
-"<h3 align=center>About QCheckers</h3>"
-"<P>Developed by"
-"<P align=right>Arseniy Sluchevskiy"
-"<P align=center>- Russia, Bryansk, 2009 -"));
+				   "<h3 align=center>About QCheckers</h3>"
+				   "<P>Developed by"
+				   "<P align=right>Arseniy Sluchevskiy"
+				   "<P align=center>- Russia, Bryansk, 2009 -"));
 }
 
 
