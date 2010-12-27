@@ -114,7 +114,7 @@ void MainWindow::save()
 
 void MainWindow::startNewGame()
 {
-	QSettings settings("Arceny","QCheckers");
+	QSettings settings("silvansky", "QCheckers");
 	actionStartNewGame->setEnabled(false);
 	int type = settings.value("type",RUSSIAN).toInt();
 	int color = myColor = settings.value("color",WHITE).toInt();
@@ -149,8 +149,6 @@ void MainWindow::endGame()
 {
 	actionEndGame->setEnabled(false);
 	game->endGame();
-	//picture->clear();
-	//picture->setState(game->currentState());
 	picture->stopThinking();
 	actionStartNewGame->setEnabled(true);
 	menuPage->setVisible(true);
@@ -187,7 +185,7 @@ void MainWindow::hideSettings()
 
 void MainWindow::saveSettings()
 {
-	QSettings settings("Arceny","QCheckers");
+	QSettings settings("silvansky", "QCheckers");
 	int color, type, depth;
 	if( comboBox->currentIndex() == 0 )
 		type = RUSSIAN;
@@ -210,7 +208,7 @@ void MainWindow::saveSettings()
 
 void MainWindow::loadSettings()
 {
-	QSettings settings("Arceny","QCheckers");
+	QSettings settings("silvansky", "QCheckers");
 
 	int color = settings.value("color",WHITE).toInt();
 	if(color != WHITE && color !=BLACK)
