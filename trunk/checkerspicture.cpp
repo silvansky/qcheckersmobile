@@ -107,11 +107,6 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
 	}
 }
 
-void CheckersPicture::mouseMoveEvent(QMouseEvent *event)
-{
-	Q_UNUSED(event)
-}
-
 void CheckersPicture::paintEvent(QPaintEvent *event)
 {
 	Q_UNUSED(event)
