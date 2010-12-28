@@ -45,7 +45,6 @@ signals:
 	void mouseClicked(int, int);
 protected:
 	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent (QResizeEvent * event);
 private:
