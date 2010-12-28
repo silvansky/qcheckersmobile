@@ -1,6 +1,6 @@
 #include "checkersgame.h"
 #include <time.h>
-#include <QDebug>
+#include <QApplication>
 
 CheckersGame::CheckersGame()
 {
@@ -11,7 +11,6 @@ CheckersGame::CheckersGame()
 	current = NULL;
 	first = NULL;
 	current = NULL;
-	//	maxlevel = 3;
 }
 
 CheckersGame::~CheckersGame() {
@@ -71,7 +70,7 @@ void CheckersGame::startNewGame(uint8 color) {
 		go();
 	} else {
 		emit stateChanged(current);
-		qDebug() << "sc1";
+		//qDebug() << "sc1";
 		pp(current,humancolor);
 	}
 }
@@ -417,29 +416,9 @@ bool CheckersGame::checkCoordinate(char x) {
 void CheckersGame::calcCounts(CheckersState * state)
 {
 	std::vector <CheckersState *> tmp;
-	//	 если уже что-то посчитано, то пораждающая процедура была выполнена ранее для
-	//	 одного из цветов
-	//	int kkk = -1;
-	//	if(state->childs().size()) {
-	//		tmp = state->childs();
-	//		kkk = tmp.at(0)->color(tmp.at(0)->move().at(0).x , tmp.at(0)->move().at(0).y);
-	//	}
+
 	state->counts().clear();
 	state->counts().resize(8,0);
-	//	uint8 x[2] = {WHITE, BLACK};
-	//	for(unsigned k=0; k<2; k++) {
-	//		if( x[k] != kkk ) {
-	//			pp(state, x[k]);
-	//			state->counts()[2+k*4] = state->childs().size();
-	//			for(unsigned i=0; i < state->childs().size(); i++)
-	//				state->counts()[3+k*4] += state->childs().at(i)->deletedAtMove();
-	//			clearTree(state,true,true);
-	//		} else {
-	//			state->counts()[2+k*4] = tmp.size();
-	//			for(unsigned i=0; i < tmp.size(); i++)
-	//				state->counts()[3+k*4] += tmp.at(i)->deletedAtMove();
-	//		}
-	//	}
 	int movescount;
 	for(unsigned i=0; i<n; i++)
 	{
@@ -451,36 +430,26 @@ void CheckersGame::calcCounts(CheckersState * state)
 			switch(state->at(i, j))
 			{
 			case WHITE:
-			{
 				state->counts()[0]++;
 				state->counts()[2] += movescount;
 				break;
-			}
 			case WHITEKING:
-			{
 				state->counts()[1]++;
 				state->counts()[2] += movescount;
 				break;
-			}
 			case BLACK:
-			{
 				state->counts()[4]++;
 				state->counts()[6] += movescount;
 				break;
-			}
 			case BLACKKING:
-			{
 				state->counts()[5]++;
 				state->counts()[6] += movescount;
 				break;
 			}
-			}
 		}
 	}
 	if(tmp.size())
-	{
 		state->childs() = tmp;
-	}
 }
 
 //  оценочная функция
@@ -491,10 +460,7 @@ int CheckersGame::evaluation(CheckersState * state) {
 	evaluation += 4 * ( state->counts()[0] - state->counts()[4] );
 	evaluation += 6 * ( state->counts()[1] - state->counts()[5] );
 	evaluation += ( state->counts()[2] - state->counts()[6] );
-	//	evaluation += 2 * ( state->counts()[3] - state->counts()[7] );
-	//	for(unsigned i=0; i< state->counts().size(); i++)
-	//		std::cout << (int)state->counts().at(i) << " ";
-	//	std::cout << "\n"; std::cout.flush();
+
 	return evaluation;
 }
 
@@ -597,6 +563,7 @@ void CheckersGame::secondClick(int i, int j)
 		if(gamerunning)
 		{
 			emit startThinking();
+			QApplication::processEvents();
 			go(); // выполним ход компом
 		}
 		click = 0;

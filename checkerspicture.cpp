@@ -1,7 +1,7 @@
 #include "checkerspicture.h"
 #include <QDebug>
 
-CheckersPicture::CheckersPicture(QWidget *parent) : QWidget(parent), hourglass(":/hourglass.png")
+CheckersPicture::CheckersPicture(QWidget *parent) : QWidget(parent)
 {
 	QPalette pal = palette();
 	pal.setColor(QPalette::Light,QColor(0x87,0xa1,0xc0, 0));
@@ -26,40 +26,49 @@ CheckersPicture::~CheckersPicture()
 
 }
 
-CheckersState * CheckersPicture::state() {
+CheckersState * CheckersPicture::state()
+{
 	return curstate;
 }
 
-void CheckersPicture::setComputerColor(uint8 color) {
+void CheckersPicture::setComputerColor(uint8 color)
+{
 	this->color = color;
 }
 
-void CheckersPicture::setState(CheckersState * state) {
-	if(state) {
+void CheckersPicture::setState(CheckersState * state)
+{
+	if(state)
+	{
 		curstate = state;
 		n = state->size();
 		v.clear();
 		//mouseClickFlag = true;
 		//update();
 		repaint();
-	} else {
+	}
+	else
+	{
 		clear();
 	}
 }
 
-void CheckersPicture::setSize(int n) {
+void CheckersPicture::setSize(int n)
+{
 	this->n = n;
 	update();
 }
 
-void CheckersPicture::deleteVector() {
+void CheckersPicture::deleteVector()
+{
 	if(v.size()) {
 		v.clear();
 		update();
 	}
 }
 
-void CheckersPicture::setVector(std::vector <point> & v) {
+void CheckersPicture::setVector(std::vector <point> & v)
+{
 	this->v = v;
 	update();
 }
@@ -74,25 +83,23 @@ void CheckersPicture::clear()
 void CheckersPicture::startThinking()
 {
 	thinking = true;
-	repaint();
+	if (showHourglass)
+		repaint();
 }
 
 void CheckersPicture::stopThinking()
 {
 	thinking = false;
-	repaint();
+	if (showHourglass)
+		update();
 }
 
 void CheckersPicture::mousePressEvent(QMouseEvent *event)
 {
-	//qDebug() << side << " " << x << " " << event->pos().x() << " " << event->pos().y();
-	//if (event->buttons() && Qt::LeftButton && mouseClickFlag) {
-	if (event->buttons() & Qt::LeftButton) {
-		//qreal i = (event->pos().x() - p.x() + side/(2*n+2)) * (n+1)/side - 1.0;
-		//qreal j = (double)n - (event->pos().y() - p.y() + side/(2*n+2)) * (n+1)/side;
+	if (event->buttons() & Qt::LeftButton)
+	{
 		qreal i = (event->pos().x() - p.x()) * (n)/side;
 		qreal j = (double)n - (event->pos().y() - p.y()) * (n)/side - 1;
-		//qDebug() << (int)i << " " << (int)j;
 		if (color==BLACK)
 			emit mouseClicked((int)i,(int)j);
 		else
@@ -102,11 +109,16 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
 
 void CheckersPicture::mouseMoveEvent(QMouseEvent *event)
 {
-
+	Q_UNUSED(event)
 }
 
 void CheckersPicture::paintEvent(QPaintEvent *event)
 {
+	Q_UNUSED(event)
+	// debug for graphic optimization tests
+	//	static int num = 0;
+	//	qDebug() << ++num;
+
 	QPainter painter(this);
 
 	painter.setRenderHint(QPainter::Antialiasing, true);
@@ -121,63 +133,85 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
 	QColor normalColor(0x4c,0x4c,0xcc,200);
 	QColor black(0x00, 0x00, 0x00, 200);
 	QColor white(0xff, 0xff, 0xff, 220);
-	for(int i=0; i<n; i++) {
-		for(int j=0; j<n; j++) {
-			QRect rect = pixelRect(i, j);
-			if( !((i+j%2)%2) ) {
-					painter.fillRect(rect, dark);
-					//painter.drawEllipse(QPoint(zoom*(i+1),zoom*(10-j)),s,s);
-			} else {
+	QRect rect;
+	for(int i=0; i<n; i++)
+	{
+		for(int j=0; j<n; j++)
+		{
+			rect = pixelRect(i, j);
+			if( !((i+j%2)%2) )
+				painter.fillRect(rect, dark);
+			else
 				painter.fillRect(rect, white);
-			}
 		}
 	}
 
 	int ix,jx;
 
-	if(v.size()) {
+	if (v.size())
+	{
 		int type;
-		for(unsigned i=0; i< v.size(); i++) {
+		QColor fillColor;
+		QRect rect;
+		for (unsigned i=0; i< v.size(); i++)
+		{
 			color==WHITE ? jx = n-1-v.at(i).y : jx = v.at(i).y;
 			color==WHITE ? ix = n-1-v.at(i).x : ix = v.at(i).x;
-			QRect rect = pixelRect(ix, jx);
+			rect = pixelRect(ix, jx);
 			type = v.at(i).type;
-			if(type == MOVEDFROM)
-				painter.fillRect(rect, startColor);
-			else if(type == MOVEDTO || type == TOKING)
-				painter.fillRect(rect, endColor);
-			else if(type == MOVEDTHROUGH)
-				painter.fillRect(rect, normalColor);
-			else if(type == DELETED)
-				painter.fillRect(rect, capturedColor);
+			switch(type)
+			{
+			case MOVEDFROM:
+				fillColor = startColor;
+				break;
+			case MOVEDTO:
+			case TOKING:
+				fillColor = endColor;
+				break;
+			case MOVEDTHROUGH:
+				fillColor = normalColor;
+				break;
+			case DELETED:
+				fillColor = capturedColor;
+				break;
+			}
+			if (fillColor.isValid())
+				painter.fillRect(rect, fillColor);
 		}
 	}
 
 	int s = zoom*0.4;
 	int sd = zoom*0.2;
-	if(curstate) {
+	if(curstate)
+	{
 		painter.setPen(QPen(black,zoom*0.1));
 		painter.setBrush(QBrush(white));
-		for(int i=0; i<n; i++) {
-			for(int j=0; j<n; j++) {
+		for(int i=0; i<n; i++)
+		{
+			for(int j=0; j<n; j++)
+			{
 				color==WHITE ? jx = j+1 : jx = n-j;
 				color==WHITE? ix = n-i : ix = i+1;
 				if(curstate->at(i,j)==WHITE)
 					painter.drawEllipse(QPoint(zoom*(ix-0.5),zoom*(jx-0.5)),s,s);
-				if(curstate->at(i,j)==WHITEKING) {
+				if(curstate->at(i,j)==WHITEKING)
+				{
 					painter.drawEllipse(QPoint(zoom*(ix-0.5),zoom*(jx-0.5)),s,s);
 					painter.drawEllipse(QPoint(zoom*(ix-0.5),zoom*(jx-0.5)),sd,sd);
 				}
 			}
 		}
 		painter.setBrush(QBrush(black));
-		for(int i=0; i<n; i++) {
-			for(int j=0; j<n; j++) {
+		for(int i=0; i<n; i++)
+		{
+			for(int j=0; j<n; j++)
+			{
 				color==WHITE ? jx = j+1 : jx = n-j;
 				color==WHITE ? ix = n-i : ix = i+1;
 				if(curstate->at(i,j)==BLACK)
 					painter.drawEllipse(QPoint(zoom*(ix-0.5),zoom*(jx-0.5)),s,s);
-				if(curstate->at(i,j)==BLACKKING) {
+				if(curstate->at(i,j)==BLACKKING)
+				{
 					painter.drawEllipse(QPoint(zoom*(ix-0.5),zoom*(jx-0.5)),s,s);
 					painter.setPen(QPen(white,zoom*0.1));
 					painter.drawEllipse(QPoint(zoom*(ix-0.5),zoom*(jx-0.5)),sd,sd);
@@ -193,13 +227,17 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
 	}
 }
 
-void CheckersPicture::resizeEvent (QResizeEvent * event) {
-	if(event->oldSize()!=event->size()) {
+void CheckersPicture::resizeEvent (QResizeEvent * event)
+{
+	if(event->oldSize()!=event->size())
+	{
 		update();
 		side = qMin(width(), height());
 		p = QPoint((width() - side) / 2, (height() - side) / 2);
-		hourglass = QImage(":/hourglass.png").scaledToHeight(side, Qt::SmoothTransformation);
-	} else {
+		hourglass = QImage(":/hourglass.png").scaledToHeight((side * 2) / 3, Qt::SmoothTransformation);
+	}
+	else
+	{
 		event->ignore();
 	}
 }
