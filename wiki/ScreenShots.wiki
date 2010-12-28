@@ -1,0 +1,22 @@
+#summary Some screenshots of QCheckers Mobile
+#labels Featured,Phase-Design,Screenshots,Images
+
+= Screenshots from Nokia 5800 XM =
+
+<table cellpadding=10 border=1>
+<tr><td>
+<a target="_blank" title="Хабрэффект.ру" href="http://habreffect.ru/040/5fecb72ea/Scr000003.jpg"><img border="0" src="http://habreffect.ru/files/040/5fecb72ea/Scr000003.jpg"/></a>
+</td><td>
+<a target="_blank" title="Хабрэффект.ру" href="http://habreffect.ru/68f/12dd0ccc9/Scr000004.jpg"><img border="0" src="http://habreffect.ru/files/68f/12dd0ccc9/Scr000004.jpg"/></a>
+</td></tr>
+<tr><td>
+<a target="_blank" title="Хабрэффект.ру" href="http://habreffect.ru/afd/f3accf3fb/Scr000005.jpg"><img border="0" src="http://habreffect.ru/files/afd/f3accf3fb/Scr000005.jpg"/></a>
+</td><td>
+<a target="_blank" title="Хабрэффект.ру" href="http://habreffect.ru/926/3b6d575fe/Scr000006.jpg"><img border="0" src="http://habreffect.ru/files/926/3b6d575fe/Scr000006.jpg"/></a>
+</td></tr>
+<tr><td>
+<a target="_blank" title="Хабрэффект.ру" href="http://habreffect.ru/6a0/767a01a7e/Scr000007.jpg"><img border="0" src="http://habreffect.ru/files/6a0/767a01a7e/Scr000007.jpg"/></a>
+</td><td>
+<a target="_blank" title="Хабрэффект.ру" href="http://habreffect.ru/5b6/6a27c641c/Scr000010.jpg"><img border="0" src="http://habreffect.ru/files/5b6/6a27c641c/Scr000010.jpg"/></a>
+</td></tr>
+</table>
